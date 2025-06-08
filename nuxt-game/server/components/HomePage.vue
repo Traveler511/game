@@ -131,57 +131,61 @@ function changePlayer() {
 const message = ref('')
 const socket = ref(null)
 
-onMounted(() => {
-  getMap()
+// onMounted(() => {
+  // getMap()
 
   // const response = fetch('/api/wsServer', {
   //   method: 'GET',  // Используем метод POST
   // });
 
 
-  const socket = new WebSocket('ws://localhost:3001/ws')
+  // const socket = new WebSocket('ws://localhost:3001/ws')
 
-  const socketTwo = new WebSocket('ws://192.168.1.181:3001/ws')
-
-  socket.onopen = () => {
-    console.log('✅ Соединение установлено')
-    socket.send('Привет, сервер!')
-  }
-
-  socket.onmessage = (event) => {
-    const answer = JSON.parse(event.data)
-    console.log(answer)
-    if(answer.type === 'update') {
-      console.log('type - update')
-      ground.value = answer.state
-    }
-
-    if(answer.type === 'setPlayer') {
-      console.log('type - update')
-      currentPlayer.value = answer.player
-    }
-  }
-
-  socketTwo.onopen = () => {
-    console.log('✅ Соединение установлено')
-    socket.send('Привет, сервер!')
-  }
-
-  socketTwo.onmessage = (event) => {
-    const answer = JSON.parse(event.data)
-    console.log(answer)
-    if(answer.type === 'update') {
-      console.log('type - update')
-      ground.value = answer.state
-    }
-
-    if(answer.type === 'setPlayer') {
-      console.log('type - update')
-      currentPlayer.value = answer.player
-    }
-  }
+  // const socketTwo = new WebSocket('ws://192.168.1.181:3001/ws')
+  //
+  // socket.onopen = () => {
+  //   console.log('✅ Соединение установлено')
+  //   socket.send('Привет, сервер!')
+  // }
+  //
+  // socket.onmessage = (event) => {
+  //   const answer = JSON.parse(event.data)
+  //   console.log(answer)
+  //   if(answer.type === 'update') {
+  //     console.log('type - update')
+  //     ground.value = answer.state
+  //   }
+  //
+  //   if(answer.type === 'setPlayer') {
+  //     console.log('type - update')
+  //     currentPlayer.value = answer.player
+  //   }
+  // }
+  //
+  // socketTwo.onopen = () => {
+  //   console.log('✅ Соединение установлено')
+  //   socket.send('Привет, сервер!')
+  // }
+  //
+  // socketTwo.onmessage = (event) => {
+  //   const answer = JSON.parse(event.data)
+  //   console.log(answer)
+  //   if(answer.type === 'update') {
+  //     console.log('type - update')
+  //     ground.value = answer.state
+  //   }
+  //
+  //   if(answer.type === 'setPlayer') {
+  //     console.log('type - update')
+  //     currentPlayer.value = answer.player
+  //   }
+  // }
 
   // mapCreate()
+// })
+
+onBeforeMount( () => {
+  getMap()
 })
 
 

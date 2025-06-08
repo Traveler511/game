@@ -131,7 +131,7 @@ function changePlayer() {
 const message = ref('')
 const socket = ref(null)
 
-// onMounted(() => {
+onMounted(() => {
   // getMap()
 
   // const response = fetch('/api/wsServer', {
@@ -139,29 +139,29 @@ const socket = ref(null)
   // });
 
 
-  // const socket = new WebSocket('ws://localhost:3001/ws')
+  const socket = new WebSocket('wss://game-1-m4qh.onrender.com//ws')
 
   // const socketTwo = new WebSocket('ws://192.168.1.181:3001/ws')
-  //
-  // socket.onopen = () => {
-  //   console.log('✅ Соединение установлено')
-  //   socket.send('Привет, сервер!')
-  // }
-  //
-  // socket.onmessage = (event) => {
-  //   const answer = JSON.parse(event.data)
-  //   console.log(answer)
-  //   if(answer.type === 'update') {
-  //     console.log('type - update')
-  //     ground.value = answer.state
-  //   }
-  //
-  //   if(answer.type === 'setPlayer') {
-  //     console.log('type - update')
-  //     currentPlayer.value = answer.player
-  //   }
-  // }
-  //
+
+  socket.onopen = () => {
+    console.log('✅ Соединение установлено')
+    socket.send('Привет, сервер!')
+  }
+
+  socket.onmessage = (event) => {
+    const answer = JSON.parse(event.data)
+    console.log(answer)
+    if(answer.type === 'update') {
+      console.log('type - update')
+      ground.value = answer.state
+    }
+
+    if(answer.type === 'setPlayer') {
+      console.log('type - update')
+      currentPlayer.value = answer.player
+    }
+  }
+
   // socketTwo.onopen = () => {
   //   console.log('✅ Соединение установлено')
   //   socket.send('Привет, сервер!')
@@ -182,7 +182,7 @@ const socket = ref(null)
   // }
 
   // mapCreate()
-// })
+})
 
 onBeforeMount( () => {
   getMap()

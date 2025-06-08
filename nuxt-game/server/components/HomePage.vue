@@ -139,7 +139,7 @@ onMounted(() => {
   // });
 
 
-  const socket = new WebSocket('wss://game-1-m4qh.onrender.com//ws')
+  const socket = new WebSocket('wss://game-1-m4qh.onrender.com/ws')
 
   // const socketTwo = new WebSocket('ws://192.168.1.181:3001/ws')
 

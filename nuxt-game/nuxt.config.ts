@@ -1,5 +1,5 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
-import { setupWebSocket } from './server/api/wsServer'
+import { setupWebSocket } from './server/api/wsServer.ts'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',

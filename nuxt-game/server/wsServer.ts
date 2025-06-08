@@ -60,32 +60,35 @@
 // }
 
 
-import { createServer } from 'http'
+// server/wsServer.ts
+// server/wsServer.ts
 import { WebSocketServer } from 'ws'
-import { createApp } from 'nuxt'
 
-const port = process.env.PORT || 3000
+export const setupWebSocket = (server: any) => {
+    const wss = new WebSocketServer({ noServer: true })
 
-async function start() {
-    const { app, server: nuxtHandler } = await createApp()
+    console.log('🟢 WebSocket сервер инициализирован')
 
-    const server = createServer(nuxtHandler)
-
-    const wss = new WebSocketServer({ server, path: '/ws' })
+    server.on('upgrade', (req, socket, head) => {
+        if (req.url === '/ws') {
+            wss.handleUpgrade(req, socket, head, (ws) => {
+                wss.emit('connection', ws, req)
+            })
+        } else {
+            socket.destroy()
+        }
+    })
 
     wss.on('connection', (ws) => {
-        console.log('🧍 Клиент подключен')
-        ws.send('Добро пожаловать!')
+        console.log('🧍 Клиент подключён')
 
-        ws.on('message', (msg) => {
-            console.log('Получено сообщение:', msg.toString())
-            ws.send('Принято: ' + msg)
+        ws.on('message', (message) => {
+            console.log('📩 Получено сообщение:', message.toString())
+            ws.send(`Принято: ${message}`)
+        })
+
+        ws.on('close', () => {
+            console.log('🚪 Клиент отключён')
         })
     })
-
-    server.listen(port, () => {
-        console.log(`✅ Сервер запущен на порту ${port}`)
-    })
 }
-
-start()

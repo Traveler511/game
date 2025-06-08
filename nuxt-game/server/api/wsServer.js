@@ -15,11 +15,11 @@ const wss = new WebSocketServer({ noServer: true })
 // })
 
 
-const http = app.listen(3001, '0.0.0.0', () => {
+const https = app.listen(3001, '0.0.0.0', () => {
     console.log('WebSocket сервер работает на порту 3000')
 })
 
-http.on('upgrade', (req, socket, head) => {
+https.on('upgrade', (req, socket, head) => {
     if (req.url === '/ws') {
         wss.handleUpgrade(req, socket, head, (ws) => {
             wss.emit('connection', ws, req)

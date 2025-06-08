@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
         Array.from({ length: horizontal }, () => freeMode ? 0 : Math.random() < 0.5 ? 0 : -1)
     )
 
-    await fetch('http://192.168.1.181:3001/broadcast', {
+    await fetch('https://game-1-m4qh.onrender.com/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(gameState.grid)

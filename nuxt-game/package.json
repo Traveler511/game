@@ -15,5 +15,8 @@
     "vue": "^3.5.16",
     "vue-router": "^4.5.1",
     "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.89.1"
   }
 }

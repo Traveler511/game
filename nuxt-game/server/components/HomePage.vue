@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import Square from "./Square.vue";
 import axios from "axios";
+import MyButton from "./MyButton.vue";
 
 const ground = ref([])
 
@@ -17,8 +18,10 @@ const countSquareVertical = ref(5)
 const countSquareHorizontal = ref(5)
 
 const freeMode = ref(false)
+const currentMove = ref(1)
 
 console.log([] == ![])
+
 
 console.log(null == false)
 
@@ -131,6 +134,11 @@ function changePlayer() {
 const message = ref('')
 const socket = ref(null)
 
+const currentMoveBackground = computed( () => {
+
+  return currentMove.value === 1 ? 'background: #989dff;' : 'background: crimson;'
+
+})
 onMounted(() => {
   // getMap()
 
@@ -156,6 +164,8 @@ onMounted(() => {
     if(answer.type === 'update') {
       console.log('type - update')
       ground.value = answer.state
+
+      currentMove.value = currentMove.value === 1 ? 2 : 1
     }
 
     if(answer.type === 'setPlayer') {
@@ -197,42 +207,74 @@ onBeforeMount( () => {
 
   <div class="home-page">
 
-
-    <button @click="changePlayer()"> Поменять игрока</button>
-
-
-
     <div class="home-page__settings">
-      <h1>настройки</h1>
-      <div>
-        <p>Клеток по горизонтали:</p>
-        <input v-model="countSquareHorizontal" type="number">
-        <p>Клеток по вертикали:</p>
-        <input v-model="countSquareVertical" type="number">
-        <br>
-        <button @click="mapCreate">Создавать карту заново</button>
-
-        <br>
-        <span>Свободный режим</span>
-        <input v-model="freeMode" type="checkbox">
+      <div class="home-page__settings__block home-page__settings__block--with-bg">
+        <div class="home-page__settings__block__content--flex">
+          <span class="home-page__settings__block__content__label"><b>Вы: {{currentPlayer == 1 ? 'Игрок 1 ' : 'Игрок 2 '}}</b></span> <div :class="{'color-player':true,'color-player--1': currentPlayer == 1, 'color-player--2': currentPlayer == 2}"></div>
+        </div>
       </div>
+
+      <div class="home-page__settings__block home-page__settings__block--with-bg">
+        <div class="home-page__settings__block__content">
+          <div class="home-page__settings__block__content__header">
+            <span>Настройки игрового поля</span>
+          </div>
+
+
+          <p class="home-page__settings__block__content__label">клеток по горизонтали  <b>{{countSquareHorizontal}}</b></p>
+          <input class="home-page__settings__block__content__input--range" v-model="countSquareHorizontal" type="range" min="3" max="20">
+          <p class="home-page__settings__block__content__label">клеток по вертикали <b> {{countSquareVertical}}</b></p>
+          <input class="home-page__settings__block__content__input--range" v-model="countSquareVertical" type="range" min="3" max="20">
+
+          <div>
+            <span>Сделать доступными все клетки</span>
+            <input v-model="freeMode" type="checkbox">
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="home-page__settings__block">
+        <my-button @click="mapCreate()" text="создать карту заново"></my-button>
+      </div>
+
+      <div class="home-page__settings__block">
+        <my-button @click="changePlayer()" text="поменять цвет"></my-button>
+      </div>
+
     </div>
 
 <!--    <button class="home-page__button&#45;&#45;refresh">Заново</button>-->
 
     <div class="home-page__ground">
-    <div class="home-page__ground__row" v-for="(row, indexRow) in ground">
-      <div class="home-page__ground__column" v-for="(column, indexColumn) in row">
-      <Square @select="selectSquare" :size="currentCountSquareVertical * currentCountSquareHorizontal" :player="Number(currentPlayer)" :squareValue="ground[indexRow][indexColumn]" :x="indexRow" :y="indexColumn"></Square>
+      <div class="home-page__ground__row" v-for="(row, indexRow) in ground">
+        <div class="home-page__ground__column" v-for="(column, indexColumn) in row">
+        <Square @select="selectSquare" :size="currentCountSquareVertical * currentCountSquareHorizontal" :player="Number(currentPlayer)" :squareValue="ground[indexRow][indexColumn]" :x="indexRow" :y="indexColumn"></Square>
+        </div>
       </div>
     </div>
+
+    <div class="home-page__panel">
+      <div :style="currentMoveBackground" class="home-page__panel__block home-page__panel__current-move">
+        <p> {{currentMove === 1 ? 'ваш ход' : 'ход соперника'}}</p>
+      </div>
+
+      <div class="home-page__panel__block">
+        <my-button :disabled="currentMove === 2" @click="mapCreate()" text="завершить ход"></my-button>
+      </div>
+
+
+      <div class="home-page__panel__block">
+        <my-button :disabled="true" @click="mapCreate()" text="отменить ход"></my-button>
+      </div>
+
     </div>
   </div>
 
 </template>
 
 <style scoped lang="scss">
-
 
 .home-page {
 
@@ -242,29 +284,76 @@ onBeforeMount( () => {
   justify-content: center;
 
   &__settings {
-    background: rgb(55,107,66);
-    border-radius: 10px;
-    padding: 10px;
-    margin-right: 5%;
-  }
 
-  &__button {
+    margin-right: 1.5vh;
 
-    &--refresh {
-      background: rgb(55,107,66);
+    &__block {
       border-radius: 10px;
-      padding: 5px 10px;
-      cursor: pointer;
-      font-size: 1.75em;
-      font-weight: 600;
-      margin-bottom: 10px;
-      transition: 0.15s;
+      margin-top: 1.5vh;
 
-      &:hover {
-        background: rgb(80,139,90);
+      &:first-of-type {
+        margin-top: 0;
       }
+
+      &--with-bg {
+        background: rgb(55,107,66);
+      }
+
+      &__content {
+        padding: 15px;
+
+        &__header {
+          text-align: center;
+          font-weight: 600;
+          font-size: 1.2em;
+        }
+
+        &__input--range {
+          width: 100%;
+        }
+
+        &__label {
+          margin: 1vh;
+        }
+
+        &--flex {
+          display: flex;
+          align-items: center;
+        }
+      }
+
     }
   }
+
+  &__panel {
+    margin-left: 1.5vh;
+    display: flex;
+    //justify-content: center;
+    //align-items: top;
+    flex-direction: column;
+
+    &__block {
+      border-radius: 10px;
+      margin-top: 1.5vh;
+
+      &:first-of-type {
+        margin-top: 0;
+      }
+    }
+
+    &__current-move {
+      text-align: center;
+
+      p {
+        margin: 1vh;
+        font-size: 1.2em;
+        font-weight: 600;
+      }
+
+    }
+  }
+
+
   &__ground {
     background: rgb(55,107,66);
     //height: 400px;
@@ -292,6 +381,20 @@ onBeforeMount( () => {
     }
 
     // 80,139,90
+  }
+}
+
+.color-player {
+  border-radius: 5px;
+  width: 20px;
+  height: 20px;
+
+  &--1 {
+    background: rgb(239, 210, 85);
+  }
+
+  &--2 {
+    background: rgb(217, 251, 196);
   }
 }
 </style>

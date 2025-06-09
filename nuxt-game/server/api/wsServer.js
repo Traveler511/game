@@ -39,6 +39,7 @@ wss.on('connection', (ws) => {
 
 // Эндпоинт для отправки обновлений
 app.post('/broadcast', (req, res) => {
+    console.log("broadcast")
     const gameState = req.body
 
     for (const client of clients) {

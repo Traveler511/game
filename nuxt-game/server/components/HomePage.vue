@@ -139,13 +139,11 @@ onMounted(() => {
   // });
 
 
-  // const socket = new WebSocket('ws://' + location.host + '/ws')
-
+  // const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
+  // const socket = new WebSocket('ws://localhost:3001/ws')
   const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
 
-  // const socket = new WebSocket('wss://game-1-m4qh.onrender.com/ws')
-  //
-  // const socket= new WebSocket('ws://192.168.1.181:3001/ws')
+
 
   socket.onopen = () => {
     console.log('✅ Соединение установлено')

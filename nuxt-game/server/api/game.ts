@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
     }
 
     // Отправим обновлённую карту WebSocket-серверу
-    await fetch('http://game-1-m4qh.onrender.com/broadcast', {
+    await fetch(`http://localhost:3001/broadcast`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(gameState.grid)

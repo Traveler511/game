@@ -1,0 +1,13 @@
+version: '3'
+services:
+  frontend:
+    build: ./nuxt-game
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ws
+
+  ws:
+    build: ./wsServer
+    ports:
+      - "3001:3001"

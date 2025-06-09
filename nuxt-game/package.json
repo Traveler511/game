@@ -7,8 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "start": "ts-node server/wsServer.ts"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "axios": "^1.9.0",

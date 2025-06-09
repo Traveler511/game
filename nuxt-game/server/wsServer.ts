@@ -80,7 +80,7 @@ export const setupWebSocket = (server: any) => {
     })
 
     wss.on('connection', (ws) => {
-        console.log('🧍 Клиент подключён')
+        console.log('🧍 Клиент подключён111')
 
         ws.on('message', (message) => {
             console.log('📩 Получено сообщение:', message.toString())

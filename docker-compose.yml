@@ -1,13 +1,39 @@
 version: '3'
+
 services:
-  frontend:
-    build: ./nuxt-game
+  nuxt:
+    platform: linux/amd64  # важно для запуска на Mac с ARM (M1/M2)
+    build:
+      context: .
+      dockerfile: nuxt-game/Dockerfile
     ports:
       - "3000:3000"
-    depends_on:
-      - ws
+    volumes:
+      - ./nuxt-game:/app
+      - /app/node_modules        # гарантирует, что node_modules внутри контейнера
+    environment:
+      - NODE_ENV=development
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"  # запуск с автоустановкой
+    networks:
+      - app-network
 
-  ws:
-    build: ./wsServer
+  websocket:
+    build:
+      context: .
+      dockerfile: wsServer/Dockerfile
     ports:
       - "3001:3001"
+    volumes:
+      - ./wsServer:/app
+      - /app/node_modules        # на всякий случай тоже
+    environment:
+      - NODE_ENV=development
+    working_dir: /app
+    command: sh -c "npm install && node index.js"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

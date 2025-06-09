@@ -1,12 +1,20 @@
+# Используем базовый образ Node.js
 FROM node:18
 
+# Устанавливаем рабочую директорию
 WORKDIR /app
 
-COPY . .
+# Копируем package.json и package-lock.json
+COPY nuxt-game/package*.json ./
 
+# Устанавливаем зависимости
 RUN npm install
-RUN npm run build
 
+# Копируем остальные файлы проекта
+COPY nuxt-game .
+
+# Открываем порт
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+# Запускаем приложение
+CMD ["npm", "run", "dev"]

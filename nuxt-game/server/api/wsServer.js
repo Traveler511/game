@@ -26,7 +26,7 @@ https.on('upgrade', (req, socket, head) => {
 // Храним всех клиентов
 wss.on('connection', (ws) => {
     clients.add(ws)
-    console.log('🧍 Клиент подключён. Клиентов:', clients.size)
+    console.log('🧍 Клиент 1подключён. Клиентов:', clients.size)
 
     if(clients.size > 1) {
         client.send(JSON.stringify({ type: 'setPlayer', state: 2 }))

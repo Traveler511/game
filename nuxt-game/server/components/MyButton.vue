@@ -4,7 +4,10 @@ import {watchOnce} from "@vueuse/core";
 
 const props = defineProps<{
   text: string;
-  disabled: boolean;
+  disabled: {
+    type: boolean,
+    default: false
+  }
 }>()
 
 

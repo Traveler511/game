@@ -14,6 +14,7 @@ export default defineEventHandler(async (event) => {
     if (action === 'makeMove') {
 
 
+
         for (let i = 0; i < ground.length; i++) {
             for (let j = 0; j < ground.length; j++) {
                 if(ground[i][j] === 3)
@@ -33,7 +34,6 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-
         console.log('ground')
         console.log(ground)
         // Заменяем каждый элемент target на соответствующий из source
@@ -44,18 +44,26 @@ export default defineEventHandler(async (event) => {
             }
         }
 
-
+        gameState.currentMovePlayer = player === 1 ? 2 : 1
 
 
         // gameState.grid[row][col] = player;
     }
 
-    // Отправим обновлённую карту WebSocket-серверу
-    await fetch(`https://wsserver-u583.onrender.com/broadcast`, {
+    console.log("broadcast")
+
+    await fetch(`http://localhost:3001/broadcast`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(gameState.grid)
+        body: JSON.stringify(gameState)
     })
+
+    // Отправим обновлённую карту WebSocket-серверу
+    // await fetch(`https://wsserver-u583.onrender.com/broadcast`, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(gameState)
+    // })
 
     return gameState;
 });

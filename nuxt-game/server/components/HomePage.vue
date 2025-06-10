@@ -109,11 +109,42 @@ async function mapCreate() {
 
   // Обработка ответа от сервера (например, обновление состояния)
   const data = await response.json()
-  ground.value = data
-  currentGround.value = data
+
+  for (let i = 0; i < data.length; i++) {
+    for (let j = 0; j < data[i].length; j++) {
+      ground.value[i][j] = data[i][j]
+    }
+  }
+
+  for (let i = 0; i < data.length; i++) {
+    for (let j = 0; j < data[i].length; j++) {
+      currentGround.value[i][j] = data[i][j]
+    }
+  }
+
   console.log(data);  // Выводим текущее состояние игры
 
 }
+
+
+async function getCurrentMove() {
+  const response = await fetch('/api/getCurrentMove', {
+    method: 'GET',  // Используем метод POST
+  });
+
+
+
+
+  // Обработка ответа от сервера (например, обновление состояния)
+  const data = await response.json()
+  console.log('current Move')
+  console.log(data)
+
+  currentMove.value = data
+
+  console.log(data)
+}
+
 
 async function getMap() {
   const response = await fetch('/api/getMap', {
@@ -122,23 +153,50 @@ async function getMap() {
 
   // Обработка ответа от сервера (например, обновление состояния)
   const data = await response.json()
-  ground.value = data
-  currentGround.value = data
+
+  ground.value = []
+  for (let i = 0; i < data.length; i++) {
+    ground.value.push([])
+    for (let j = 0; j < data[i].length; j++) {
+      ground.value[i][j] = data[i][j]
+    }
+  }
+
+  currentGround.value = []
+  for (let i = 0; i < data.length; i++) {
+    currentGround.value.push([])
+    for (let j = 0; j < data[i].length; j++) {
+      currentGround.value[i][j] = data[i][j]
+    }
+  }
+
   console.log(data)
 }
 
 
 function changePlayer() {
- currentPlayer.value = currentPlayer.value == 2 ? 1 : 2
+ currentPlayer.value = currentPlayer.value === 2 ? 1 : 2
 }
 const message = ref('')
 const socket = ref(null)
 
 const currentMoveBackground = computed( () => {
 
-  return currentMove.value === 1 ? 'background: #989dff;' : 'background: crimson;'
+  return currentMove.value === currentPlayer.value ? 'background: #989dff;' : 'background: crimson;'
 
 })
+
+function cancelMove() {
+  console.log(currentGround.value)
+  console.log(ground.value)
+  for (let i = 0; i < currentGround.value.length; i++) {
+    for (let j = 0; j < currentGround.value[i].length; j++) {
+      console.log(j)
+      currentGround.value[i][j] = ground.value[i][j]
+    }
+  }
+}
+
 onMounted(() => {
   // getMap()
 
@@ -148,10 +206,8 @@ onMounted(() => {
 
 
   // const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
-  // const socket = new WebSocket('ws://localhost:3001/ws')
-  const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
-
-
+  const socket = new WebSocket('ws://localhost:3001/ws')
+  // const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
 
   socket.onopen = () => {
     console.log('✅ Соединение установлено')
@@ -159,20 +215,33 @@ onMounted(() => {
   }
 
   socket.onmessage = (event) => {
+    console.log("web  socket answer")
     const answer = JSON.parse(event.data)
     console.log(answer)
     if(answer.type === 'update') {
       console.log('type - update')
-      ground.value = answer.state
-      currentGround.value = answer.state
 
-      currentMove.value = currentMove.value === 1 ? 2 : 1
+      const grid = answer.state.grid
+
+      for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[i].length; j++) {
+          ground.value[i][j] = grid[i][j]
+        }
+      }
+
+      for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid[i].length; j++) {
+          currentGround.value[i][j] = grid[i][j]
+        }
+      }
+
+      currentMove.value = answer.state.currentMovePlayer
     }
 
-    if(answer.type === 'setPlayer') {
-      console.log('type - update')
-      currentPlayer.value = answer.player
-    }
+    // if(answer.type === 'setPlayer') {
+    //   console.log('type - update = player')
+    //   currentPlayer.value = answer.player
+    // }
   }
 
   // socketTwo.onopen = () => {
@@ -199,6 +268,7 @@ onMounted(() => {
 
 onBeforeMount( () => {
   getMap()
+  getCurrentMove()
 })
 
 
@@ -251,23 +321,23 @@ onBeforeMount( () => {
     <div class="home-page__ground">
       <div class="home-page__ground__row" v-for="(row, indexRow) in ground">
         <div class="home-page__ground__column" v-for="(column, indexColumn) in row">
-        <Square @select="selectSquare" :size="currentCountSquareVertical * currentCountSquareHorizontal" :player="Number(currentPlayer)" :squareValue="ground[indexRow][indexColumn]" :x="indexRow" :y="indexColumn"></Square>
+        <Square @select="selectSquare" :size="currentCountSquareVertical * currentCountSquareHorizontal" :player="Number(currentPlayer)" :squareValue="currentGround[indexRow][indexColumn]" :x="indexRow" :y="indexColumn"></Square>
         </div>
       </div>
     </div>
 
     <div class="home-page__panel">
       <div :style="currentMoveBackground" class="home-page__panel__block home-page__panel__current-move">
-        <p> {{currentMove === 1 ? 'ваш ход' : 'ход соперника'}}</p>
+        <p> {{currentMove === currentPlayer ? 'ваш ход' : 'ход соперника'}}</p>
       </div>
 
       <div class="home-page__panel__block">
-        <my-button :disabled="currentMove === 2" @click="makeMove()" text="завершить ход"></my-button>
+        <my-button :disabled="currentMove !== currentPlayer" @click="makeMove()" text="завершить ход"></my-button>
       </div>
 
 
       <div class="home-page__panel__block">
-        <my-button :disabled="true" @click="mapCreate()" text="отменить ход"></my-button>
+        <my-button @click="cancelMove()" text="отменить ход"></my-button>
       </div>
 
     </div>

@@ -5,6 +5,7 @@ import axios from "axios";
 import MyButton from "./MyButton.vue";
 
 const ground = ref([])
+const currentGround = ref([])
 
 const currentPlayer = ref(1)
 const firstSquare = ref([0,0])
@@ -25,9 +26,7 @@ console.log([] == ![])
 
 console.log(null == false)
 
-async function selectSquare(x: number, y: number) {
-
-
+async function makeMove() {
   const response = await fetch('/api/game', {
     method: 'POST',  // Используем метод POST
     headers: {
@@ -35,8 +34,7 @@ async function selectSquare(x: number, y: number) {
     },
     body: JSON.stringify({
       action: 'makeMove',  // Указываем действие
-      row: x,                 // Координаты строки
-      col: y,                 // Координаты колонки
+      ground: currentGround.value,
       player: currentPlayer.value,              // Игрок, который делает ход
     }),
   });
@@ -44,9 +42,10 @@ async function selectSquare(x: number, y: number) {
   // Обработка ответа от сервера (например, обновление состояния)
   const data = await response
   console.log(data);  // Выводим текущее состояние игры
+}
+async function selectSquare(x: number, y: number) {
 
-
-  // await getMap()
+  currentGround.value[x][y] = currentPlayer.value;
 
   // if(!hasPick.value) {
   //
@@ -78,7 +77,6 @@ async function selectSquare(x: number, y: number) {
   //     alert('жульничаем?')
   //   }
 
-    // currentPlayer.value = currentPlayer.value === 1 ? 2 : 1
     hasPick.value = false
   // }
 
@@ -112,6 +110,7 @@ async function mapCreate() {
   // Обработка ответа от сервера (например, обновление состояния)
   const data = await response.json()
   ground.value = data
+  currentGround.value = data
   console.log(data);  // Выводим текущее состояние игры
 
 }
@@ -124,6 +123,7 @@ async function getMap() {
   // Обработка ответа от сервера (например, обновление состояния)
   const data = await response.json()
   ground.value = data
+  currentGround.value = data
   console.log(data)
 }
 
@@ -164,6 +164,7 @@ onMounted(() => {
     if(answer.type === 'update') {
       console.log('type - update')
       ground.value = answer.state
+      currentGround.value = answer.state
 
       currentMove.value = currentMove.value === 1 ? 2 : 1
     }
@@ -261,7 +262,7 @@ onBeforeMount( () => {
       </div>
 
       <div class="home-page__panel__block">
-        <my-button :disabled="currentMove === 2" @click="mapCreate()" text="завершить ход"></my-button>
+        <my-button :disabled="currentMove === 2" @click="makeMove()" text="завершить ход"></my-button>
       </div>
 
 

@@ -31,7 +31,7 @@ const sizeStyle = computed(() => ({
 <template>
 
 <div @click="$emit('select', x,y)" :style="sizeStyle" :class="{'square':true,'square--empty': squareValue === 0,'square--selected--first-player': squareValue === 1,
- 'square--selected--second-player': squareValue === 2}">
+ 'square--selected--second-player': squareValue === 2, 'square--selected--past-move': squareValue === 3 || squareValue === 4}">
 <!--  {{x}}-->
 <!--  {{y}}-->
 <!--  {{squareValue}}-->
@@ -57,6 +57,10 @@ const sizeStyle = computed(() => ({
 
     &--second-player {
       background: rgb(217, 251, 196);
+    }
+
+    &--past-move {
+      background: #30e41d;
     }
   }
 }

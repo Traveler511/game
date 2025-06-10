@@ -14,9 +14,9 @@ export default defineEventHandler(async (event) => {
     await fetch('https://wsserver-u583.onrender.com/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(gameState.grid)
+        body: JSON.stringify(gameState)
     })
 
-    return gameState.grid
+    return gameState
 
 });

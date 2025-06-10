@@ -31,7 +31,7 @@ const sizeStyle = computed(() => ({
 <template>
 
 <div @click="$emit('select', x,y)" :style="sizeStyle" :class="{'square':true,'square--empty': squareValue === 0,'square--selected--first-player': squareValue === 1,
- 'square--selected--second-player': squareValue === 2, 'square--selected--past-move': squareValue === 3 || squareValue === 4}">
+ 'square--selected--second-player': squareValue === 2, 'square--selected--past-move': squareValue === 3 || squareValue === 4, 'square--selected--finish': squareValue === 10}">
 <!--  {{x}}-->
 <!--  {{y}}-->
 <!--  {{squareValue}}-->
@@ -42,25 +42,29 @@ const sizeStyle = computed(() => ({
 
 <style scoped lang="scss">
 .square {
-  background: rgb(55,107,66);
+  background: $color-pine;
   box-sizing: border-box;
   cursor: pointer;
 
   &--empty {
-    background: rgb(80,139,90);
+    background: $color-sage;
   }
   &--selected {
 
     &--first-player {
-      background: rgb(239, 210, 85);
+      background: $color-first;
     }
 
     &--second-player {
-      background: rgb(217, 251, 196);
+      background: $color-second;
     }
 
     &--past-move {
-      background: #30e41d;
+      background: $color-cream;
+    }
+
+    &--finish {
+      background: rgba(135, 219, 246, 0.78);
     }
   }
 }

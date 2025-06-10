@@ -2,13 +2,13 @@
 import {computed, ref, watch} from 'vue'
 import {watchOnce} from "@vueuse/core";
 
-const props = defineProps<{
-  text: string;
-  disabled: {
-    type: boolean,
-    default: false
-  }
-}>()
+const props = withDefaults(defineProps<{
+  text: string
+  disabled: boolean
+}>(), {
+  text: '',
+  disabled: false
+})
 
 
 const emit = defineEmits(['click'])
@@ -25,7 +25,7 @@ const emit = defineEmits(['click'])
 
 <style scoped lang="scss">
 .my-button {
-  background: rgb(55,107,66);
+  background: $color-pine;
   box-sizing: border-box;
   cursor: pointer;
   display: flex;
@@ -36,7 +36,7 @@ const emit = defineEmits(['click'])
   width: 100%;
 
   &:hover {
-    background: rgb(35, 122, 54);
+    background: $color-sage;
   }
 
   &--disabled {

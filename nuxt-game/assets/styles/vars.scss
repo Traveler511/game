@@ -1,0 +1,40 @@
+// vars.scss
+
+// Основные цвета (от светлого к тёмному)
+$color-cream:    #f1f4e9;
+$color-mint:     #c9dbb2;
+$color-sage:     #88a88a;
+$color-pine:     #2f463b;
+$color-burgundy: #5c1e26;
+$color-coral: rgb(239, 129, 110);
+
+$color-blue: rgb(86, 144, 223);
+$color-red: rgb(232, 92, 92);
+
+$color-first: #b1d67a;
+$color-second: #3c8045;
+
+
+// Акценты
+$primary-color:     $color-sage;
+$secondary-color:   $color-coral;
+$background-color:  $color-cream;
+$text-color:        $color-pine;
+$danger-color:      $color-burgundy;
+
+// Отступы
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+
+// Радиусы
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+
+// Тени
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 3px 6px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 5px 10px rgba(0, 0, 0, 0.2);

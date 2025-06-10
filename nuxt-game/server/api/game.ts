@@ -52,18 +52,18 @@ export default defineEventHandler(async (event) => {
 
     console.log("broadcast")
 
-    await fetch(`http://localhost:3001/broadcast`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(gameState)
-    })
-
-    // Отправим обновлённую карту WebSocket-серверу
-    // await fetch(`https://wsserver-u583.onrender.com/broadcast`, {
+    // await fetch(`http://localhost:3001/broadcast`, {
     //     method: 'POST',
     //     headers: { 'Content-Type': 'application/json' },
     //     body: JSON.stringify(gameState)
     // })
+
+    // Отправим обновлённую карту WebSocket-серверу
+    await fetch(`https://wsserver-u583.onrender.com/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(gameState)
+    })
 
     return gameState;
 });

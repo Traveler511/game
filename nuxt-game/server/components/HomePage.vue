@@ -11,6 +11,7 @@ const currentPlayer = ref(1)
 const firstSquare = ref([0,0])
 const lastSquare = ref([0,0])
 const hasPick = ref(false)
+const finish = ref(false)
 
 const currentCountSquareVertical = ref(5)
 const currentCountSquareHorizontal = ref(5)
@@ -45,7 +46,8 @@ async function makeMove() {
 }
 async function selectSquare(x: number, y: number) {
 
-  currentGround.value[x][y] = currentPlayer.value;
+  if(currentGround.value[x][y] === 0)
+    currentGround.value[x][y] = currentPlayer.value;
 
   // if(!hasPick.value) {
   //
@@ -174,6 +176,22 @@ async function getMap() {
 }
 
 
+function finishAnimation() {
+
+  let count = 0
+  for (let i = 0; i < ground.value.length; i++) {
+    for (let j = 0; j < ground.value[i].length; j++) {
+      count++
+      setTimeout(() => {
+        currentGround.value[i][j] = 10
+        console.log(((i + 1) * (j + 1)))
+      },count * 200)
+
+    }
+  }
+
+
+}
 function changePlayer() {
  currentPlayer.value = currentPlayer.value === 2 ? 1 : 2
 }
@@ -182,16 +200,14 @@ const socket = ref(null)
 
 const currentMoveBackground = computed( () => {
 
-  return currentMove.value === currentPlayer.value ? 'background: #989dff;' : 'background: crimson;'
+  return currentMove.value === currentPlayer.value ? {background: 'rgb(86, 144, 223)',color: '#f1f4e9'} : {background: 'rgb(232, 92, 92)',color: '#f1f4e9'}
 
 })
 
 function cancelMove() {
-  console.log(currentGround.value)
-  console.log(ground.value)
+
   for (let i = 0; i < currentGround.value.length; i++) {
     for (let j = 0; j < currentGround.value[i].length; j++) {
-      console.log(j)
       currentGround.value[i][j] = ground.value[i][j]
     }
   }
@@ -206,8 +222,8 @@ onMounted(() => {
 
 
   // const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
-  const socket = new WebSocket('ws://localhost:3001/ws')
-  // const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
+  // const socket = new WebSocket('ws://localhost:3001/ws')
+  const socket = new WebSocket('https://wsserver-u583.onrender.com/ws')
 
   socket.onopen = () => {
     console.log('✅ Соединение установлено')
@@ -218,23 +234,35 @@ onMounted(() => {
     console.log("web  socket answer")
     const answer = JSON.parse(event.data)
     console.log(answer)
+
     if(answer.type === 'update') {
       console.log('type - update')
 
+      let checkFinish = true
+
       const grid = answer.state.grid
 
+      ground.value = []
       for (let i = 0; i < grid.length; i++) {
+        ground.value.push([])
         for (let j = 0; j < grid[i].length; j++) {
+          if(grid[i][j] === 0)
+            checkFinish = false
           ground.value[i][j] = grid[i][j]
         }
       }
 
+      currentGround.value = []
       for (let i = 0; i < grid.length; i++) {
+        currentGround.value.push([])
         for (let j = 0; j < grid[i].length; j++) {
           currentGround.value[i][j] = grid[i][j]
         }
       }
 
+      finish.value = checkFinish
+      if(finish.value)
+        finishAnimation()
       currentMove.value = answer.state.currentMovePlayer
     }
 
@@ -279,40 +307,7 @@ onBeforeMount( () => {
   <div class="home-page">
 
     <div class="home-page__settings">
-      <div class="home-page__settings__block home-page__settings__block--with-bg">
-        <div class="home-page__settings__block__content--flex">
-          <span class="home-page__settings__block__content__label"><b>Вы: {{currentPlayer == 1 ? 'Игрок 1 ' : 'Игрок 2 '}}</b></span> <div :class="{'color-player':true,'color-player--1': currentPlayer == 1, 'color-player--2': currentPlayer == 2}"></div>
-        </div>
-      </div>
 
-      <div class="home-page__settings__block home-page__settings__block--with-bg">
-        <div class="home-page__settings__block__content">
-          <div class="home-page__settings__block__content__header">
-            <span>Настройки игрового поля</span>
-          </div>
-
-
-          <p class="home-page__settings__block__content__label">клеток по горизонтали  <b>{{countSquareHorizontal}}</b></p>
-          <input class="home-page__settings__block__content__input--range" v-model="countSquareHorizontal" type="range" min="3" max="20">
-          <p class="home-page__settings__block__content__label">клеток по вертикали <b> {{countSquareVertical}}</b></p>
-          <input class="home-page__settings__block__content__input--range" v-model="countSquareVertical" type="range" min="3" max="20">
-
-          <div>
-            <span>Сделать доступными все клетки</span>
-            <input v-model="freeMode" type="checkbox">
-          </div>
-        </div>
-
-
-      </div>
-
-      <div class="home-page__settings__block">
-        <my-button @click="mapCreate()" text="создать карту заново"></my-button>
-      </div>
-
-      <div class="home-page__settings__block">
-        <my-button @click="changePlayer()" text="поменять цвет"></my-button>
-      </div>
 
     </div>
 
@@ -335,9 +330,43 @@ onBeforeMount( () => {
         <my-button :disabled="currentMove !== currentPlayer" @click="makeMove()" text="завершить ход"></my-button>
       </div>
 
-
       <div class="home-page__panel__block">
         <my-button @click="cancelMove()" text="отменить ход"></my-button>
+      </div>
+
+      <div class="home-page__settings__block home-page__settings__block--with-bg ">
+        <div class="home-page__settings__block__content--flex">
+          <span class="home-page__settings__block__content__label"><b>Вы: {{currentPlayer == 1 ? 'Игрок 1 ' : 'Игрок 2 '}}</b></span> <div :class="{'color-player':true,'color-player--1': currentPlayer == 1, 'color-player--2': currentPlayer == 2}"></div>
+        </div>
+      </div>
+
+      <div class="home-page__settings__block home-page__settings__block--first home-page__settings__block--with-bg">
+        <div class="home-page__settings__block__content">
+          <div class="home-page__settings__block__content__header">
+            <span>Настройки игрового поля</span>
+          </div>
+
+
+          <p class="home-page__settings__block__content__label">клеток по горизонтали  <b>{{countSquareHorizontal}}</b></p>
+          <input class="home-page__settings__block__content__input--range" v-model="countSquareHorizontal" type="range" min="3" max="20">
+          <p class="home-page__settings__block__content__label">клеток по вертикали <b> {{countSquareVertical}}</b></p>
+          <input class="home-page__settings__block__content__input--range" v-model="countSquareVertical" type="range" min="3" max="20">
+
+          <div>
+            <span>Свободный режим</span>
+            <input v-model="freeMode" type="checkbox">
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="home-page__settings__block">
+        <my-button @click="mapCreate()" text="создать карту заново"></my-button>
+      </div>
+
+      <div class="home-page__settings__block">
+        <my-button @click="changePlayer()" text="поменять цвет"></my-button>
       </div>
 
     </div>
@@ -347,12 +376,24 @@ onBeforeMount( () => {
 
 <style scoped lang="scss">
 
+
+@media (max-width: 768px) {
+  .home-page {
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+  }
+}
+
 .home-page {
 
-  margin-top:20vh;
+  margin-top:10vh;
   width: 100%;
   display: flex;
   justify-content: center;
+
+
+
 
   &__settings {
 
@@ -367,7 +408,11 @@ onBeforeMount( () => {
       }
 
       &--with-bg {
-        background: rgb(55,107,66);
+        background: $color-pine;
+      }
+
+      &--first {
+        margin-top: 5vh;
       }
 
       &__content {
@@ -397,7 +442,7 @@ onBeforeMount( () => {
   }
 
   &__panel {
-    margin-left: 1.5vh;
+    margin-left: 3vh;
     display: flex;
     //justify-content: center;
     //align-items: top;
@@ -410,6 +455,8 @@ onBeforeMount( () => {
       &:first-of-type {
         margin-top: 0;
       }
+
+
     }
 
     &__current-move {
@@ -426,7 +473,7 @@ onBeforeMount( () => {
 
 
   &__ground {
-    background: rgb(55,107,66);
+    background: $color-pine;
     //height: 400px;
     //width: 400px;
     border-radius: 10px;
@@ -461,11 +508,11 @@ onBeforeMount( () => {
   height: 20px;
 
   &--1 {
-    background: rgb(239, 210, 85);
+    background: $color-sage;
   }
 
   &--2 {
-    background: rgb(217, 251, 196);
+    background: $color-mint;
   }
 }
 </style>
